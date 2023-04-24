@@ -1,0 +1,12 @@
+type Event {
+  id: ID!
+  text: String!
+}
+
+extend type Mutation {
+  createEvent(text: String!): Event!
+}
+
+extend type Subscription {
+  eventCreated: Event!
+}
