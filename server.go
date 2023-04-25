@@ -12,8 +12,6 @@ import (
 	"gqlgen-subscriptions/graph/resolvers"
 
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 )
 
@@ -28,10 +26,6 @@ func main() {
 	eventChannel := make(chan *m.Event)
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers.Resolver{EventChannel: eventChannel}}))
-	srv.AddTransport(transport.Options{})
-	srv.AddTransport(transport.POST{})
-
-	srv.Use(extension.Introspection{})
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
 	http.Handle("/graphql", srv)
