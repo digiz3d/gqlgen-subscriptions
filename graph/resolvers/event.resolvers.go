@@ -14,7 +14,9 @@ import (
 // CreateEvent is the resolver for the createEvent field.
 func (r *mutationResolver) CreateEvent(ctx context.Context, text string) (*model.Event, error) {
 	newEvent := &model.Event{ID: uuid.NewString(), Text: text}
-	r.EventChannel <- newEvent
+	go func() {
+		r.EventChannel <- newEvent
+	}()
 	return newEvent, nil
 }
 
