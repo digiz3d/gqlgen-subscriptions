@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"gqlgen-subscriptions/graph/generated"
-	m "gqlgen-subscriptions/graph/model"
 	"gqlgen-subscriptions/graph/resolvers"
+	"gqlgen-subscriptions/utils"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
@@ -28,9 +28,9 @@ func main() {
 		port = defaultPort
 	}
 
-	eventChannel := make(chan *m.Event)
+	pubsub := utils.NewPubsub()
 
-	srv := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers.Resolver{EventChannel: eventChannel}}))
+	srv := handler.New(generated.NewExecutableSchema(generated.Config{Resolvers: &resolvers.Resolver{Pubsub: pubsub}}))
 
 	srv.AddTransport(transport.Websocket{
 		KeepAlivePingInterval: 10 * time.Second,

@@ -14,13 +14,17 @@ import (
 // CreateEvent is the resolver for the createEvent field.
 func (r *mutationResolver) CreateEvent(ctx context.Context, text string) (*model.Event, error) {
 	newEvent := &model.Event{ID: uuid.NewString(), Text: text}
-	go func() {
-		r.EventChannel <- newEvent
-	}()
+	r.Pubsub.Publish("newEvent", newEvent)
 	return newEvent, nil
 }
 
 // EventCreated is the resolver for the eventCreated field.
 func (r *subscriptionResolver) EventCreated(ctx context.Context) (<-chan *model.Event, error) {
-	return r.EventChannel, nil
+	channel := r.Pubsub.Subscribe("newEvent")
+
+	go func() {
+		<-ctx.Done()
+		r.Pubsub.Unsubscribe("newEvent", channel)
+	}()
+	return channel, nil
 }
