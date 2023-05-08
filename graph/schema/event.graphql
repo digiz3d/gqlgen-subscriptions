@@ -8,5 +8,5 @@ extend type Mutation {
 }
 
 extend type Subscription {
-  eventCreated: Event!
+  eventCreated(who: String): Event!
 }

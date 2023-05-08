@@ -6,6 +6,7 @@ package resolvers
 
 import (
 	"context"
+	"fmt"
 	"gqlgen-subscriptions/graph/model"
 
 	"github.com/google/uuid"
@@ -19,12 +20,23 @@ func (r *mutationResolver) CreateEvent(ctx context.Context, text string) (*model
 }
 
 // EventCreated is the resolver for the eventCreated field.
-func (r *subscriptionResolver) EventCreated(ctx context.Context) (<-chan *model.Event, error) {
+func (r *subscriptionResolver) EventCreated(ctx context.Context, who *string) (<-chan *model.Event, error) {
 	channel := r.Pubsub.Subscribe("newEvent")
+
+	if who != nil {
+		fmt.Printf("%s subscribed\n", *who)
+	} else {
+		fmt.Println("Someone subscribed")
+	}
 
 	go func() {
 		<-ctx.Done()
 		r.Pubsub.Unsubscribe("newEvent", channel)
+		if who != nil {
+			fmt.Printf("%s unsubscribed\n", *who)
+		} else {
+			fmt.Println("Someone unsubscribed")
+		}
 	}()
 	return channel, nil
 }
